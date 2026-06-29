@@ -32,10 +32,7 @@ A full-stack SaaS application for clinics where patients can book appointments a
 - Production deployment
 
 ## Screenshots
-Add screenshots here.
 
 ## Live Demo
-Frontend URL here
 
 ## API URL
-Backend URL here
