@@ -1,11 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const appointmentController = require("../controllers/appointmentController");
 
-router.post("/", appointmentController.bookAppointment);
+const {
+    bookAppointment,
+    getMyAppointments,
+    updateAppointmentStatus
+} = require("../controllers/appointmentController");
 
-router.get("/my", appointmentController.getMyAppointments);
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
-router.put("/:id/status", appointmentController.updateStatus);
+router.post("/", protect, authorizeRoles("patient"), bookAppointment);
+
+router.get("/my", protect, getMyAppointments);
+
+router.put(
+    "/:id/status",
+    protect,
+    authorizeRoles("doctor", "admin"),
+    updateAppointmentStatus
+);
 
 module.exports = router;
