@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
@@ -8,13 +8,8 @@ function BookAppointment() {
     const { doctorId } = useParams();
     const navigate = useNavigate();
 
-    const timeSlots = [
-        "4:00 PM",
-        "5:00 PM",
-        "6:00 PM",
-        "7:00 PM",
-        "8:00 PM",
-    ];
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
 
     const [form, setForm] = useState({
         appointmentDate: "",
@@ -22,7 +17,28 @@ function BookAppointment() {
         reason: "",
     });
 
-    const [message, setMessage] = useState("");
+    useEffect(() => {
+        const fetchAvailableSlots = async () => {
+            if (!form.appointmentDate) return;
+
+            try {
+                setLoadingSlots(true);
+                setForm((prev) => ({ ...prev, appointmentTime: "" }));
+
+                const res = await API.get(
+                    `/appointments/available-slots?doctor=${doctorId}&date=${form.appointmentDate}`
+                );
+
+                setAvailableSlots(res.data.availableSlots);
+            } catch (error) {
+                toast.error(error.response?.data?.message || "Failed to load slots");
+            } finally {
+                setLoadingSlots(false);
+            }
+        };
+
+        fetchAvailableSlots();
+    }, [form.appointmentDate, doctorId]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,6 +60,7 @@ function BookAppointment() {
             });
 
             toast.success("Appointment booked successfully!");
+
             setTimeout(() => {
                 navigate("/patient-dashboard");
             }, 1000);
@@ -55,10 +72,6 @@ function BookAppointment() {
     return (
         <DashboardLayout title="Book Appointment">
             <div className="max-w-xl bg-white p-6 rounded-xl shadow">
-                {message && (
-                    <p className="mb-4 text-green-600 font-medium">{message}</p>
-                )}
-
                 <form onSubmit={handleBook} className="space-y-5">
                     <div>
                         <label className="block mb-1 font-medium">Appointment Date</label>
@@ -73,29 +86,39 @@ function BookAppointment() {
                     </div>
 
                     <div>
-                        <label className="block mb-2 font-medium">Select Time Slot</label>
+                        <label className="block mb-2 font-medium">Available Time Slots</label>
+
+                        {!form.appointmentDate && (
+                            <p className="text-sm text-slate-500">
+                                Select a date to view available slots.
+                            </p>
+                        )}
+
+                        {loadingSlots && (
+                            <p className="text-sm text-blue-600">Loading available slots...</p>
+                        )}
+
+                        {form.appointmentDate && !loadingSlots && availableSlots.length === 0 && (
+                            <p className="text-sm text-red-600">
+                                No slots available for this date.
+                            </p>
+                        )}
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {timeSlots.map((time) => (
+                            {availableSlots.map((time) => (
                                 <button
                                     type="button"
                                     key={time}
                                     onClick={() => selectTime(time)}
                                     className={`border py-3 rounded-lg ${form.appointmentTime === time
-                                        ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white text-slate-700"
+                                            ? "bg-blue-600 text-white border-blue-600"
+                                            : "bg-white text-slate-700"
                                         }`}
                                 >
                                     {time}
                                 </button>
                             ))}
                         </div>
-
-                        {!form.appointmentTime && (
-                            <p className="text-sm text-slate-500 mt-2">
-                                Please select an appointment time.
-                            </p>
-                        )}
                     </div>
 
                     <div>
