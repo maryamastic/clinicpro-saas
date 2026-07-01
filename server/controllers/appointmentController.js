@@ -123,8 +123,55 @@ const updateAppointmentStatus = async (req, res) => {
     }
 };
 
+const getAvailableSlots = async (req, res) => {
+    try {
+        const { doctor, date } = req.query;
+
+        if (!doctor || !date) {
+            return res.status(400).json({
+                message: "Doctor id and date are required"
+            });
+        }
+
+        const allSlots = [
+            "4:00 PM",
+            "5:00 PM",
+            "6:00 PM",
+            "7:00 PM",
+            "8:00 PM"
+        ];
+
+        const bookedAppointments = await Appointment.find({
+            doctor,
+            appointmentDate: date,
+            status: { $in: ["pending", "accepted"] }
+        });
+
+        const bookedSlots = bookedAppointments.map(
+            (appointment) => appointment.appointmentTime
+        );
+
+        const availableSlots = allSlots.filter(
+            (slot) => !bookedSlots.includes(slot)
+        );
+
+        res.json({
+            doctor,
+            date,
+            availableSlots
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to get available slots",
+            error: error.message
+        });
+    }
+};
+
+
 module.exports = {
     bookAppointment,
     getMyAppointments,
-    updateAppointmentStatus
+    updateAppointmentStatus,
+    getAvailableSlots
 };
