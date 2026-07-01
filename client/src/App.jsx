@@ -10,7 +10,7 @@ import BookAppointment from "./pages/BookAppointment";
 function App() {
   return (
     <BrowserRouter>
-      <nav>
+      <nav className="bg-blue-600 text-white p-4 flex gap-4">
         <Link to="/login">Login</Link> |{" "}
         <Link to="/register">Register</Link> |{" "}
         <Link to="/doctors">Doctors</Link>
