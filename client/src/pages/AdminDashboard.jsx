@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
+import { toast } from "react-toastify";
 
 function AdminDashboard() {
     const [doctors, setDoctors] = useState([]);
@@ -45,33 +46,43 @@ function AdminDashboard() {
     const addDoctor = async (e) => {
         e.preventDefault();
 
-        await API.post("/doctors", {
-            ...form,
-            experience: Number(form.experience),
-            fee: Number(form.fee),
-            availableDays: form.availableDays.split(",").map((day) => day.trim()),
-        });
+        try {
+            await API.post("/doctors", {
+                ...form,
+                experience: Number(form.experience),
+                fee: Number(form.fee),
+                availableDays: form.availableDays.split(",").map((day) => day.trim()),
+            });
 
-        setForm({
-            name: "",
-            specialization: "",
-            email: "",
-            phone: "",
-            experience: "",
-            fee: "",
-            availableDays: "",
-            availableTime: "",
-            imageUrl: "",
-        });
+            toast.success("Doctor added successfully");
 
-        fetchDoctors();
+            setForm({
+                name: "",
+                specialization: "",
+                email: "",
+                phone: "",
+                experience: "",
+                fee: "",
+                availableDays: "",
+                availableTime: "",
+                imageUrl: "",
+            });
+
+            fetchDoctors();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to add doctor");
+        }
     };
 
     const deleteDoctor = async (id) => {
-        await API.delete(`/doctors/${id}`);
-        fetchDoctors();
+        try {
+            await API.delete(`/doctors/${id}`);
+            toast.success("Doctor deleted successfully");
+            fetchDoctors();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to delete doctor");
+        }
     };
-
     return (
         <DashboardLayout title="Admin Dashboard">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

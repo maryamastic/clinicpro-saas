@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function Login() {
     const navigate = useNavigate();
@@ -22,9 +23,12 @@ function Login() {
 
             if (res.data.user.role === "admin") navigate("/admin");
             else if (res.data.user.role === "doctor") navigate("/doctor-dashboard");
-            else navigate("/patient-dashboard");
+
+            else
+                toast.success("Welcome back!");
+            navigate("/patient-dashboard");
         } catch (err) {
-            setError(err.response?.data?.message || "Login failed");
+            toast.error(error.response?.data?.message || "Login failed");
         }
     };
 

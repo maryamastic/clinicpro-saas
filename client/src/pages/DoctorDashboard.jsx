@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
+import { toast } from "react-toastify";
 
 function DoctorDashboard() {
     const [appointments, setAppointments] = useState([]);
@@ -11,8 +12,19 @@ function DoctorDashboard() {
     };
 
     const updateStatus = async (id, status) => {
-        await API.put(`/appointments/${id}/status`, { status });
-        fetchAppointments();
+        try {
+            await API.put(`/appointments/${id}/status`, { status });
+
+            if (status === "accepted") {
+                toast.success("Appointment accepted");
+            } else if (status === "rejected") {
+                toast.success("Appointment rejected");
+            }
+
+            fetchAppointments();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
     };
 
     useEffect(() => {

@@ -2,19 +2,23 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
+import { toast } from "react-toastify";
 
 function PatientDashboard() {
     const [appointments, setAppointments] = useState([]);
 
     useEffect(() => {
         const fetchAppointments = async () => {
-            const res = await API.get("/appointments/my");
-            setAppointments(res.data.appointments);
+            try {
+                const res = await API.get("/appointments/my");
+                setAppointments(res.data.appointments);
+            } catch (error) {
+                toast.error(error.response?.data?.message || "Unable to load appointments");
+            }
         };
 
         fetchAppointments();
     }, []);
-
     const total = appointments.length;
     const pending = appointments.filter((a) => a.status === "pending").length;
     const accepted = appointments.filter((a) => a.status === "accepted").length;

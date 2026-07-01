@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
+import { toast } from "react-toastify";
 
 function BookAppointment() {
     const { doctorId } = useParams();
@@ -42,13 +43,12 @@ function BookAppointment() {
                 reason: form.reason,
             });
 
-            setMessage("Appointment booked successfully!");
-
+            toast.success("Appointment booked successfully!");
             setTimeout(() => {
                 navigate("/patient-dashboard");
             }, 1000);
         } catch (error) {
-            setMessage(error.response?.data?.message || "Booking failed");
+            toast.error(error.response?.data?.message || "Booking failed");
         }
     };
 
