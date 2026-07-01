@@ -41,9 +41,21 @@ const bookAppointment = async (req, res) => {
 
 const getMyAppointments = async (req, res) => {
     try {
-        const patient = req.user._id;
+        let filter = {};
 
-        const appointments = await Appointment.find({ patient })
+        if (req.user.role === "patient") {
+            filter.patient = req.user._id;
+        }
+
+        if (req.user.role === "doctor") {
+            filter = {};
+        }
+
+        if (req.user.role === "admin") {
+            filter = {};
+        }
+
+        const appointments = await Appointment.find(filter)
             .populate("doctor")
             .populate("patient", "name email role")
             .sort({ createdAt: -1 });
