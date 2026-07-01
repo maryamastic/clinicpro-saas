@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
 import { toast } from "react-toastify";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function BookAppointment() {
     const { doctorId } = useParams();
@@ -10,6 +12,7 @@ function BookAppointment() {
 
     const [availableSlots, setAvailableSlots] = useState([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     const [form, setForm] = useState({
         appointmentDate: "",
@@ -75,12 +78,21 @@ function BookAppointment() {
                 <form onSubmit={handleBook} className="space-y-5">
                     <div>
                         <label className="block mb-1 font-medium">Appointment Date</label>
-                        <input
-                            type="date"
-                            name="appointmentDate"
-                            value={form.appointmentDate}
-                            onChange={handleChange}
-                            required
+                        <DatePicker
+                            selected={selectedDate}
+                            onChange={(date) => {
+                                setSelectedDate(date);
+
+                                const formattedDate = date.toISOString().split("T")[0];
+
+                                setForm({
+                                    ...form,
+                                    appointmentDate: formattedDate,
+                                    appointmentTime: "",
+                                });
+                            }}
+                            minDate={new Date()}
+                            placeholderText="Select appointment date"
                             className="w-full border p-3 rounded-lg"
                         />
                     </div>
@@ -111,8 +123,8 @@ function BookAppointment() {
                                     key={time}
                                     onClick={() => selectTime(time)}
                                     className={`border py-3 rounded-lg ${form.appointmentTime === time
-                                            ? "bg-blue-600 text-white border-blue-600"
-                                            : "bg-white text-slate-700"
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "bg-white text-slate-700"
                                         }`}
                                 >
                                     {time}
