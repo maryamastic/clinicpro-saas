@@ -6,11 +6,17 @@ import DashboardLayout from "../components/DashboardLayout";
 function DoctorProfile() {
     const { doctorId } = useParams();
     const [doctor, setDoctor] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [averageRating, setAverageRating] = useState(0);
 
     useEffect(() => {
         const fetchDoctor = async () => {
-            const res = await API.get(`/doctors/${doctorId}`);
-            setDoctor(res.data);
+            const doctorRes = await API.get(`/doctors/${doctorId}`);
+            setDoctor(doctorRes.data);
+
+            const reviewRes = await API.get(`/reviews/doctor/${doctorId}`);
+            setReviews(reviewRes.data.reviews);
+            setAverageRating(reviewRes.data.averageRating);
         };
 
         fetchDoctor();
@@ -26,7 +32,7 @@ function DoctorProfile() {
 
     return (
         <DashboardLayout title="Doctor Profile">
-            <div className="max-w-3xl bg-white rounded-xl shadow p-8">
+            <div className="max-w-4xl bg-white rounded-xl shadow p-8">
                 <div className="h-40 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
                     <span className="text-6xl">👨‍⚕️</span>
                 </div>
@@ -34,6 +40,10 @@ function DoctorProfile() {
                 <h1 className="text-3xl font-bold">{doctor.name}</h1>
                 <p className="text-blue-600 text-lg font-medium mt-1">
                     {doctor.specialization}
+                </p>
+
+                <p className="mt-3 text-yellow-600 font-semibold">
+                    ⭐ {averageRating} / 5 ({reviews.length} review(s))
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-slate-700">
@@ -58,6 +68,24 @@ function DoctorProfile() {
                         </button>
                     </Link>
                 </div>
+            </div>
+
+            <div className="max-w-4xl mt-6 bg-white rounded-xl shadow p-8">
+                <h2 className="text-2xl font-bold mb-4">Patient Reviews</h2>
+
+                {reviews.length === 0 ? (
+                    <p className="text-slate-500">No reviews yet.</p>
+                ) : (
+                    <div className="space-y-4">
+                        {reviews.map((review) => (
+                            <div key={review._id} className="border-b pb-4">
+                                <p className="font-semibold">{review.patient.name}</p>
+                                <p className="text-yellow-600">⭐ {review.rating} / 5</p>
+                                <p className="text-slate-700">{review.comment}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </DashboardLayout>
     );
