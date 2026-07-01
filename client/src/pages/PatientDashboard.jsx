@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import { Link } from "react-router-dom";
+import DashboardLayout from "../components/DashboardLayout";
 
 function PatientDashboard() {
     const [appointments, setAppointments] = useState([]);
@@ -15,29 +16,33 @@ function PatientDashboard() {
     }, []);
 
     return (
-        <div>
-            <h1>Patient Dashboard</h1>
+        <DashboardLayout title="Patient Dashboard">
 
-            <Link to="/doctors">
-                <button>Book New Appointment</button>
-            </Link>
+            <div>
+                <h1>Patient Dashboard</h1>
 
-            <h2>My Appointments</h2>
+                <Link to="/doctors">
+                    <button>Book New Appointment</button>
+                </Link>
 
-            {appointments.length === 0 ? (
-                <p>No appointments yet.</p>
-            ) : (
-                appointments.map((item) => (
-                    <div key={item._id}>
-                        <h3>{item.doctor.name}</h3>
-                        <p>{item.doctor.specialization}</p>
-                        <p>{item.appointmentDate} at {item.appointmentTime}</p>
-                        <p>Status: {item.status}</p>
-                        <hr />
-                    </div>
-                ))
-            )}
-        </div>
+                <h2>My Appointments</h2>
+
+                {appointments.length === 0 ? (
+                    <p>No appointments yet.</p>
+                ) : (
+                    appointments.map((item) => (
+                        <div key={item._id}>
+                            <h3>{item.doctor.name}</h3>
+                            <p>{item.doctor.specialization}</p>
+                            <p>{item.appointmentDate} at {item.appointmentTime}</p>
+                            <p>Status: {item.status}</p>
+                            <hr />
+                        </div>
+                    ))
+                )}
+            </div>
+        </DashboardLayout>
+
     );
 }
 

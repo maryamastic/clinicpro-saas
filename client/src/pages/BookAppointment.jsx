@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import DashboardLayout from "../components/DashboardLayout";
 
 function BookAppointment() {
     const { doctorId } = useParams();
@@ -15,10 +16,7 @@ function BookAppointment() {
     const [message, setMessage] = useState("");
 
     const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleBook = async (e) => {
@@ -43,46 +41,57 @@ function BookAppointment() {
     };
 
     return (
-        <div>
-            <h1>Book Appointment</h1>
+        <DashboardLayout title="Book Appointment">
+            <div className="max-w-xl bg-white p-6 rounded-xl shadow">
+                {message && (
+                    <p className="mb-4 text-green-600 font-medium">{message}</p>
+                )}
 
-            {message && <p>{message}</p>}
+                <form onSubmit={handleBook} className="space-y-4">
+                    <div>
+                        <label className="block mb-1 font-medium">Appointment Date</label>
+                        <input
+                            type="date"
+                            name="appointmentDate"
+                            value={form.appointmentDate}
+                            onChange={handleChange}
+                            required
+                            className="w-full border p-3 rounded-lg"
+                        />
+                    </div>
 
-            <form onSubmit={handleBook}>
-                <input
-                    type="date"
-                    name="appointmentDate"
-                    value={form.appointmentDate}
-                    onChange={handleChange}
-                    required
-                />
+                    <div>
+                        <label className="block mb-1 font-medium">Appointment Time</label>
+                        <input
+                            type="text"
+                            name="appointmentTime"
+                            placeholder="Example: 7:00 PM"
+                            value={form.appointmentTime}
+                            onChange={handleChange}
+                            required
+                            className="w-full border p-3 rounded-lg"
+                        />
+                    </div>
 
-                <br />
+                    <div>
+                        <label className="block mb-1 font-medium">Reason</label>
+                        <textarea
+                            name="reason"
+                            placeholder="Reason for appointment"
+                            value={form.reason}
+                            onChange={handleChange}
+                            required
+                            className="w-full border p-3 rounded-lg"
+                            rows="4"
+                        />
+                    </div>
 
-                <input
-                    type="text"
-                    name="appointmentTime"
-                    placeholder="Example: 7:00 PM"
-                    value={form.appointmentTime}
-                    onChange={handleChange}
-                    required
-                />
-
-                <br />
-
-                <textarea
-                    name="reason"
-                    placeholder="Reason for appointment"
-                    value={form.reason}
-                    onChange={handleChange}
-                    required
-                />
-
-                <br />
-
-                <button type="submit">Confirm Booking</button>
-            </form>
-        </div>
+                    <button className="w-full bg-blue-600 text-white py-3 rounded-lg">
+                        Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </DashboardLayout>
     );
 }
 
