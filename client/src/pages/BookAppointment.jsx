@@ -7,6 +7,14 @@ function BookAppointment() {
     const { doctorId } = useParams();
     const navigate = useNavigate();
 
+    const timeSlots = [
+        "4:00 PM",
+        "5:00 PM",
+        "6:00 PM",
+        "7:00 PM",
+        "8:00 PM",
+    ];
+
     const [form, setForm] = useState({
         appointmentDate: "",
         appointmentTime: "",
@@ -17,6 +25,10 @@ function BookAppointment() {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const selectTime = (time) => {
+        setForm({ ...form, appointmentTime: time });
     };
 
     const handleBook = async (e) => {
@@ -47,7 +59,7 @@ function BookAppointment() {
                     <p className="mb-4 text-green-600 font-medium">{message}</p>
                 )}
 
-                <form onSubmit={handleBook} className="space-y-4">
+                <form onSubmit={handleBook} className="space-y-5">
                     <div>
                         <label className="block mb-1 font-medium">Appointment Date</label>
                         <input
@@ -61,16 +73,29 @@ function BookAppointment() {
                     </div>
 
                     <div>
-                        <label className="block mb-1 font-medium">Appointment Time</label>
-                        <input
-                            type="text"
-                            name="appointmentTime"
-                            placeholder="Example: 7:00 PM"
-                            value={form.appointmentTime}
-                            onChange={handleChange}
-                            required
-                            className="w-full border p-3 rounded-lg"
-                        />
+                        <label className="block mb-2 font-medium">Select Time Slot</label>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {timeSlots.map((time) => (
+                                <button
+                                    type="button"
+                                    key={time}
+                                    onClick={() => selectTime(time)}
+                                    className={`border py-3 rounded-lg ${form.appointmentTime === time
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "bg-white text-slate-700"
+                                        }`}
+                                >
+                                    {time}
+                                </button>
+                            ))}
+                        </div>
+
+                        {!form.appointmentTime && (
+                            <p className="text-sm text-slate-500 mt-2">
+                                Please select an appointment time.
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -86,7 +111,10 @@ function BookAppointment() {
                         />
                     </div>
 
-                    <button className="w-full bg-blue-600 text-white py-3 rounded-lg">
+                    <button
+                        disabled={!form.appointmentTime}
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:bg-slate-400"
+                    >
                         Confirm Booking
                     </button>
                 </form>

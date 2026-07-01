@@ -4,6 +4,8 @@ import DashboardLayout from "../components/DashboardLayout";
 
 function AdminDashboard() {
     const [doctors, setDoctors] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+
     const [form, setForm] = useState({
         name: "",
         specialization: "",
@@ -21,9 +23,20 @@ function AdminDashboard() {
         setDoctors(res.data.doctors);
     };
 
+    const fetchAppointments = async () => {
+        const res = await API.get("/appointments/my");
+        setAppointments(res.data.appointments);
+    };
+
     useEffect(() => {
         fetchDoctors();
+        fetchAppointments();
     }, []);
+
+    const totalDoctors = doctors.length;
+    const totalAppointments = appointments.length;
+    const pending = appointments.filter((a) => a.status === "pending").length;
+    const accepted = appointments.filter((a) => a.status === "accepted").length;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -61,6 +74,28 @@ function AdminDashboard() {
 
     return (
         <DashboardLayout title="Admin Dashboard">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white p-5 rounded-xl shadow">
+                    <p className="text-slate-500">Total Doctors</p>
+                    <h3 className="text-3xl font-bold">{totalDoctors}</h3>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl shadow">
+                    <p className="text-slate-500">Total Appointments</p>
+                    <h3 className="text-3xl font-bold">{totalAppointments}</h3>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl shadow">
+                    <p className="text-slate-500">Pending</p>
+                    <h3 className="text-3xl font-bold text-yellow-600">{pending}</h3>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl shadow">
+                    <p className="text-slate-500">Accepted</p>
+                    <h3 className="text-3xl font-bold text-green-600">{accepted}</h3>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-xl shadow">
                     <h2 className="text-xl font-bold mb-4">Add Doctor</h2>

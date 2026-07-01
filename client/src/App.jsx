@@ -6,6 +6,7 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Doctors from "./pages/Doctors";
 import BookAppointment from "./pages/BookAppointment";
+import DoctorProfile from "./pages/DoctorsProfile";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
+        <Route path="/doctor/:doctorId" element={<DoctorProfile />} />
       </Routes>
     </BrowserRouter>
   );
