@@ -41,6 +41,7 @@ const bookAppointment = async (req, res) => {
 
 const getMyAppointments = async (req, res) => {
     try {
+        // await new Promise((resolve) => setTimeout(resolve, 2000)); testing loaders
         let filter = {};
 
         if (req.user.role === "patient") {

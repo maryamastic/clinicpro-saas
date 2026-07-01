@@ -75,6 +75,10 @@ function AdminDashboard() {
     };
 
     const deleteDoctor = async (id) => {
+        const confirmed = window.confirm("Are you sure you want to delete this doctor?");
+
+        if (!confirmed) return;
+
         try {
             await API.delete(`/doctors/${id}`);
             toast.success("Doctor deleted successfully");

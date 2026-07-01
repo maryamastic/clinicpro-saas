@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
+import Loader from "../components/Loader";
 import { toast } from "react-toastify";
 
 function PatientDashboard() {
     const [appointments, setAppointments] = useState([]);
-
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
@@ -14,6 +15,8 @@ function PatientDashboard() {
                 setAppointments(res.data.appointments);
             } catch (error) {
                 toast.error(error.response?.data?.message || "Unable to load appointments");
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -57,7 +60,9 @@ function PatientDashboard() {
             <h2 className="text-xl font-semibold mt-6 mb-4">My Appointments</h2>
 
             <div className="space-y-4">
-                {appointments.length === 0 ? (
+                {loading ? (
+                    <Loader text="Loading appointments..." />
+                ) : appointments.length === 0 ? (
                     <p className="text-slate-500">No appointments yet.</p>
                 ) : (
                     appointments.map((item) => (
@@ -69,7 +74,9 @@ function PatientDashboard() {
                             </p>
                             <p>
                                 Status:{" "}
-                                <span className="font-semibold uppercase">{item.status}</span>
+                                <span className="font-semibold uppercase">
+                                    {item.status}
+                                </span>
                             </p>
                         </div>
                     ))
