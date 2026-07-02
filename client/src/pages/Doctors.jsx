@@ -91,9 +91,17 @@ function Doctors() {
                     ) : (
                         filteredDoctors.map((doctor) => (
                             <div key={doctor._id} className="bg-white rounded-xl shadow p-6">
-                                <div className="h-32 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                                    <span className="text-4xl">👨‍⚕️</span>
-                                </div>
+                                {doctor.imageUrl ? (
+                                    <img
+                                        src={doctor.imageUrl}
+                                        alt={doctor.name}
+                                        className="h-32 w-full object-cover rounded-lg mb-4"
+                                    />
+                                ) : (
+                                    <div className="h-32 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                        <span className="text-4xl">👨‍⚕️</span>
+                                    </div>
+                                )}
 
                                 <h2 className="text-xl font-bold">{doctor.name}</h2>
                                 <p className="text-blue-600 font-medium">{doctor.specialization}</p>

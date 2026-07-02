@@ -33,9 +33,17 @@ function DoctorProfile() {
     return (
         <DashboardLayout title="Doctor Profile">
             <div className="max-w-4xl bg-white rounded-xl shadow p-8">
-                <div className="h-40 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                    <span className="text-6xl">👨‍⚕️</span>
-                </div>
+                {doctor.imageUrl ? (
+                    <img
+                        src={doctor.imageUrl}
+                        alt={doctor.name}
+                        className="h-64 w-full object-cover rounded-xl mb-6"
+                    />
+                ) : (
+                    <div className="h-40 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                        <span className="text-6xl">👨‍⚕️</span>
+                    </div>
+                )}
 
                 <h1 className="text-3xl font-bold">{doctor.name}</h1>
                 <p className="text-blue-600 text-lg font-medium mt-1">
