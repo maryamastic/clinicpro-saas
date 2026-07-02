@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import DashboardLayout from "../components/DashboardLayout";
 import { toast } from "react-toastify";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 function AdminDashboard() {
     const [doctors, setDoctors] = useState([]);
@@ -129,6 +130,27 @@ function AdminDashboard() {
         }
     };
 
+    const statusChartData = [
+        { name: "Pending", value: pending },
+        { name: "Accepted", value: accepted },
+        {
+            name: "Rejected",
+            value: appointments.filter((a) => a.status === "rejected").length,
+        },
+    ];
+
+    const specializationData = Object.values(
+        doctors.reduce((acc, doctor) => {
+            acc[doctor.specialization] = acc[doctor.specialization] || {
+                specialization: doctor.specialization,
+                count: 0,
+            };
+
+            acc[doctor.specialization].count += 1;
+            return acc;
+        }, {})
+    );
+
     return (
         <DashboardLayout title="Admin Dashboard">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -156,6 +178,43 @@ function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-xl shadow">
                     <h2 className="text-xl font-bold mb-4">Add Doctor</h2>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div className="bg-white p-6 rounded-xl shadow">
+                            <h2 className="text-xl font-bold mb-4">Appointment Status</h2>
+
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie
+                                        data={statusChartData}
+                                        dataKey="value"
+                                        nameKey="name"
+                                        outerRadius={90}
+                                        label
+                                    >
+                                        {statusChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow">
+                            <h2 className="text-xl font-bold mb-4">Doctors by Specialization</h2>
+
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart data={specializationData}>
+                                    <XAxis dataKey="specialization" />
+                                    <YAxis allowDecimals={false} />
+                                    <Tooltip />
+                                    <Bar dataKey="count" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
 
                     <form onSubmit={addDoctor} className="space-y-3">
                         <input
