@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 function PatientDashboard() {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [reviewedAppointments, setReviewedAppointments] = useState([]);
 
     const [reviewForm, setReviewForm] = useState({
         appointmentId: "",
@@ -52,6 +53,8 @@ function PatientDashboard() {
             });
 
             toast.success("Review submitted successfully");
+            setReviewedAppointments([...reviewedAppointments, reviewForm.appointmentId]);
+            fetchAppointments();
 
             setReviewForm({
                 appointmentId: "",
@@ -63,6 +66,35 @@ function PatientDashboard() {
             toast.error(error.response?.data?.message || "Failed to submit review");
         }
     };
+
+    const fetchReviewedAppointments = async () => {
+        const reviewedIds = [];
+
+        for (const appointment of appointments) {
+            try {
+                const res = await API.get(`/reviews/doctor/${appointment.doctor._id}`);
+
+                const alreadyReviewed = res.data.reviews.some(
+                    (review) => review.appointment?._id === appointment._id || review.appointment === appointment._id
+                );
+
+                if (alreadyReviewed) {
+                    reviewedIds.push(appointment._id);
+                }
+            } catch {
+                // ignore
+            }
+        }
+
+        setReviewedAppointments(reviewedIds);
+    };
+
+    useEffect(() => {
+        if (appointments.length > 0) {
+            fetchReviewedAppointments();
+        }
+    }, [appointments]);
+
 
     const total = appointments.length;
     const pending = appointments.filter((a) => a.status === "pending").length;
@@ -119,13 +151,15 @@ function PatientDashboard() {
                                 <span className="font-semibold uppercase">{item.status}</span>
                             </p>
 
-                            {item.status === "accepted" && (
-                                <button
+                            {item.status === "accepted" &&
+                                !reviewedAppointments.includes(item._id) && (<button
                                     onClick={() => openReviewForm(item)}
                                     className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded-lg"
                                 >
                                     Leave Review
-                                </button>
+                                </button>)}
+                            {reviewedAppointments.includes(item._id) && (
+                                <p className="mt-4 text-green-600 font-medium">Review submitted</p>
                             )}
                         </div>
                     ))

@@ -1,5 +1,6 @@
 const Appointment = require("../models/Appointment");
 const Doctor = require("../models/Doctor");
+const sendEmail = require("../services/emailService");
 
 const bookAppointment = async (req, res) => {
     try {
@@ -39,6 +40,18 @@ const bookAppointment = async (req, res) => {
             appointmentDate,
             appointmentTime,
             reason
+        });
+
+        await sendEmail({
+            to: req.user.email,
+            subject: "Appointment Booked - ClinicPro",
+            html: `
+    <h2>Appointment Booked Successfully</h2>
+    <p>Your appointment has been booked.</p>
+    <p><strong>Date:</strong> ${appointmentDate}</p>
+    <p><strong>Time:</strong> ${appointmentTime}</p>
+    <p><strong>Reason:</strong> ${reason}</p>
+  `,
         });
 
         res.status(201).json({
