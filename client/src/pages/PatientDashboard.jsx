@@ -8,20 +8,62 @@ import { toast } from "react-toastify";
 function PatientDashboard() {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const res = await API.get("/appointments/my");
-                setAppointments(res.data.appointments);
-            } catch (error) {
-                toast.error(error.response?.data?.message || "Unable to load appointments");
-            } finally {
-                setLoading(false);
-            }
-        };
 
+    const [reviewForm, setReviewForm] = useState({
+        appointmentId: "",
+        doctorId: "",
+        rating: 5,
+        comment: "",
+    });
+
+    const fetchAppointments = async () => {
+        try {
+            const res = await API.get("/appointments/my");
+            setAppointments(res.data.appointments);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Unable to load appointments");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchAppointments();
     }, []);
+
+    const openReviewForm = (appointment) => {
+        setReviewForm({
+            appointmentId: appointment._id,
+            doctorId: appointment.doctor._id,
+            rating: 5,
+            comment: "",
+        });
+    };
+
+    const submitReview = async (e) => {
+        e.preventDefault();
+
+        try {
+            await API.post("/reviews", {
+                doctor: reviewForm.doctorId,
+                appointment: reviewForm.appointmentId,
+                rating: Number(reviewForm.rating),
+                comment: reviewForm.comment,
+            });
+
+            toast.success("Review submitted successfully");
+
+            setReviewForm({
+                appointmentId: "",
+                doctorId: "",
+                rating: 5,
+                comment: "",
+            });
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to submit review");
+        }
+    };
+
     const total = appointments.length;
     const pending = appointments.filter((a) => a.status === "pending").length;
     const accepted = appointments.filter((a) => a.status === "accepted").length;
@@ -74,14 +116,75 @@ function PatientDashboard() {
                             </p>
                             <p>
                                 Status:{" "}
-                                <span className="font-semibold uppercase">
-                                    {item.status}
-                                </span>
+                                <span className="font-semibold uppercase">{item.status}</span>
                             </p>
+
+                            {item.status === "accepted" && (
+                                <button
+                                    onClick={() => openReviewForm(item)}
+                                    className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded-lg"
+                                >
+                                    Leave Review
+                                </button>
+                            )}
                         </div>
                     ))
                 )}
             </div>
+
+            {reviewForm.appointmentId && (
+                <div className="mt-8 bg-white p-6 rounded-xl shadow max-w-xl">
+                    <h2 className="text-xl font-bold mb-4">Leave a Review</h2>
+
+                    <form onSubmit={submitReview} className="space-y-4">
+                        <select
+                            value={reviewForm.rating}
+                            onChange={(e) =>
+                                setReviewForm({ ...reviewForm, rating: e.target.value })
+                            }
+                            className="w-full border p-3 rounded-lg"
+                        >
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Good</option>
+                            <option value="3">3 - Average</option>
+                            <option value="2">2 - Poor</option>
+                            <option value="1">1 - Bad</option>
+                        </select>
+
+                        <textarea
+                            value={reviewForm.comment}
+                            onChange={(e) =>
+                                setReviewForm({ ...reviewForm, comment: e.target.value })
+                            }
+                            placeholder="Write your review..."
+                            required
+                            className="w-full border p-3 rounded-lg"
+                            rows="4"
+                        />
+
+                        <div className="flex gap-3">
+                            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                Submit Review
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setReviewForm({
+                                        appointmentId: "",
+                                        doctorId: "",
+                                        rating: 5,
+                                        comment: "",
+                                    })
+                                }
+                                className="bg-slate-200 text-slate-800 px-4 py-2 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
         </DashboardLayout>
     );
 }
