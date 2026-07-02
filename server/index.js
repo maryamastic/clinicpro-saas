@@ -8,6 +8,7 @@ const healthRoutes = require("./routes/healthRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const app = express();
 
 connectDB();
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/upload", uploadRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
